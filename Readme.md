@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"time"
 
-	inmemlib "github.com/arturmazanik/in-memory-cache/inmemorylibrary"
+	inmemlib "github.com/arturmazanik/In-memory-cache_go-test-library"
 )
 
 func main() {
