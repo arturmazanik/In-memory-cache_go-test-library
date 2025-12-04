@@ -1,6 +1,12 @@
 # Go In-Memory-Library (lite) #
 training project
 
+## Setup ##
+
+```
+go get github.com/arturmazanik/in-memory-cache/inmemorylibrary
+```
+
 ## Example ## 
 
 ```
