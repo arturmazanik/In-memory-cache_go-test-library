@@ -4,7 +4,7 @@ training project
 ## Setup ##
 
 ```
-go get github.com/arturmazanik/in-memory-cache/inmemorylibrary
+go get github.com/arturmazanik/In-memory-cache_go-test-library 
 ```
 
 ## Example ## 
