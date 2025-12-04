@@ -1,7 +1,7 @@
-#Go In-Memory-Library (lite)#
-trainin project
+# Go In-Memory-Library (lite) #
+training project
 
-##Example## 
+## Example ## 
 
 ```
 package main
