@@ -4,7 +4,7 @@ training project
 ## Setup ##
 
 ```
-go get github.com/arturmazanik/In-memory-cache_go-test-library 
+go get github.com/arturmazanik/in-memory-cache_go-test-library 
 ```
 
 ## Example ## 
@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"time"
 
-	inmemlib "github.com/arturmazanik/In-memory-cache_go-test-library"
+	inmemlib "github.com/arturmazanik/in-memory-cache_go-test-library"
 )
 
 func main() {
