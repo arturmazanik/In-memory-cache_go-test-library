@@ -10,24 +10,31 @@ go get github.com/arturmazanik/in-memory-cache_go-test-library
 ## Example ## 
 
 ```
-package main
-
-import (
-	"fmt"
-	"time"
-
-	inmemlib "github.com/arturmazanik/in-memory-cache_go-test-library"
-)
-
 func main() {
-	c := inmemlib.NewCache(5 * time.Second)
-	c.Set("foo", "bar", 15)
+	cache := inmemlib.NewCache()
+	wp := inmemlib.NewWorkerPool(3, cache)
+	wp.Run()
 
-	val, ok := c.Get("foo")
-	fmt.Println(val, ok) // bar true
+	// Отправляем задачи
+	for i := 1; i <= 10; i++ {
+		task := inmemlib.CacheTask{
+			Key:   fmt.Sprintf("key-%d", i),
+			Value: strconv.Itoa(i * 10),
+			TTL:   time.Second * 5,
+		}
+		wp.Tasks <- task
+	}
 
-	c.Delete("foo")
-	val, ok = c.Get("foo")
-	fmt.Println(val, ok)
+	// Завершаем работу воркеров
+	wp.Wait()
+
+	// Проверка
+	for i := 1; i <= 10; i++ {
+		if val, ok := cache.Get(fmt.Sprintf("key-%d", i)); ok {
+			fmt.Println("Cache value:", val)
+		} else {
+			fmt.Println("Key expired or missing:", i)
+		}
+	}
 }
 ```
