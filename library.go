@@ -23,29 +23,24 @@ func NewCache(ttl time.Duration) *Cache {
 	}
 }
 
-func (c *Cache) Set(key string, value string, lifeTime time.Duration) error {
+func (c *Cache) Set(key string, value string, lifeTime time.Duration) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	c.storage[key] = cacheItem{
 		value:       value,
 		whenExpired: lifeTime,
 	}
-
-	c.mu.Unlock()
-
-	return nil
 }
 
 func (c *Cache) Get(key string) (interface{}, bool) {
-	c.mu.Lock()
+	c.mu.RLock()
+	item, exists := c.storage[key]
+	c.mu.RUnlock()
 
-	item, found := c.storage[key]
-
-	if !found {
+	if !exists {
 		return nil, false
 	}
-
-	c.mu.Unlock()
 
 	return item.value, true
 }
