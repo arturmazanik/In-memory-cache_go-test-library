@@ -6,49 +6,69 @@ import (
 	"time"
 )
 
+// Элемент кеша
 type cacheItem struct {
-	value       any
-	whenExpired time.Duration
+	value      interface{}
+	expiration int64
 }
 
+// Кеш с защитой для горутин
 type Cache struct {
-	mu       sync.RWMutex
-	lifeTime time.Duration
-	storage  map[string]cacheItem
+	mu    sync.RWMutex
+	items map[string]cacheItem
 }
 
-func NewCache(ttl time.Duration) *Cache {
+// Новый кеш
+func NewCache() *Cache {
 	return &Cache{
-		lifeTime: ttl,
-		storage:  make(map[string]cacheItem),
+		items: make(map[string]cacheItem),
 	}
 }
 
-func (c *Cache) Set(key string, value string, lifeTime time.Duration) {
+// Установить значение с TTL
+func (c *Cache) Set(key string, value interface{}, ttl time.Duration) {
+	exp := int64(0)
+	if ttl > 0 {
+		exp = time.Now().Add(ttl).UnixNano()
+	}
+
 	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.storage[key] = cacheItem{
-		value:       value,
-		whenExpired: lifeTime,
+	c.items[key] = cacheItem{
+		value:      value,
+		expiration: exp,
 	}
+	c.mu.Unlock()
 }
 
+// Получить значение
 func (c *Cache) Get(key string) (interface{}, bool) {
 	c.mu.RLock()
-	item, exists := c.storage[key]
+	it, ok := c.items[key]
 	c.mu.RUnlock()
 
-	if !exists {
+	if !ok {
 		return nil, false
 	}
 
-	return item.value, true
+	if it.expiration > 0 && time.Now().UnixNano() > it.expiration {
+		c.Delete(key)
+		return nil, false
+	}
+
+	return it.value, true
 }
 
+// Удалить ключ
 func (c *Cache) Delete(key string) {
 	c.mu.Lock()
-	delete(c.storage, key)
+	delete(c.items, key)
+	c.mu.Unlock()
+}
+
+// Очистить кеш
+func (c *Cache) Clear() {
+	c.mu.Lock()
+	c.items = make(map[string]cacheItem)
 	c.mu.Unlock()
 }
 
